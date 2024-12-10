@@ -12,7 +12,6 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [forecast, setForecast] = useState(null);
-  const [city, setCity] = useState('');
 
   const fetchWeather = async (city) => {
     setError(null);
@@ -38,6 +37,12 @@ const App = () => {
       setFavorites(updatedFavorites);
       localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     }
+  };
+
+  const removeFavorite = (city) => {
+    const updatedFavorites = favorites.filter((item) => item !== city);
+    setFavorites(updatedFavorites);
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   };
 
   useEffect(() => {
@@ -76,31 +81,12 @@ const App = () => {
     } catch (err) {
       setError('Unable to fetch forecast');
     }
-  };
-
-  const handleCityChange = (event) => {
-    setCity(event.target.value);
-  };
-
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
-    fetchWeather(city);
-  };
-
+  }
+  
   return (
     <div className="app">
       <h1>Weather App</h1>
-     
-      <form onSubmit={handleSearchSubmit}>
-        <input
-          type="text"
-          value={city}
-          onChange={handleCityChange}
-          placeholder="Enter city name"
-        />
-        <button type="submit">Search</button>
-      </form>
-
+      <WeatherSearch onSearch={fetchWeather} />
       <button onClick={fetchWeatherByLocation}>Get Weather for My Location</button>
       
       {loading && <LoadingSpinner />}
@@ -120,7 +106,13 @@ const App = () => {
       <ul>
         {favorites.map((city, index) => (
           <li key={index}>
-            <button onClick={() => fetchWeather(city)}>{city}</button>
+            <span>{city}</span>
+            <span
+              style={{ marginLeft: '10px', cursor: 'pointer', color: '#f56eb5' }}
+              onClick={() => removeFavorite(city)}
+            >
+              Remove
+            </span>
           </li>
         ))}
       </ul>

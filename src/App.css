@@ -67,28 +67,46 @@ ul {
 }
 
 ul li {
-  margin-bottom: 10px;
-  font-size: 18px;
+  margin-bottom: 15px; 
+  font-size: 22px; 
   color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-ul li button {
-  padding: 6px 12px;
-  background-color: #eb2f96;
-  color: white;
-  border: none;
-  border-radius: 6px;
+ul li span {
+  font-size: 22px; 
+  color: #f5f5f5;
   cursor: pointer;
-  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+ul li span:hover {
+  color: #f56eb5; 
+}
+
+
+ul li span:nth-child(2) {
+  margin-left: 10px;
+  padding: 8px 16px; 
+  background: linear-gradient(135deg, #eb2f96, #f56eb5); 
+  color: white !important; 
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px; 
   transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  padding: 8px 16px;
 }
 
-ul li button:hover {
-  background-color: #d92b85;
-  transform: translateX(4px);
+ul li span:nth-child(2):hover {
+  background: linear-gradient(135deg, #f56eb5, #d92b85); 
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-ul li button:active {
+ul li span:nth-child(2):active {
   transform: translateY(2px);
 }
 
@@ -173,8 +191,11 @@ input[type="text"]:focus {
     padding: 15px;
   }
 
-  ul li button {
-    padding: 6px 12px;
-    font-size: 14px;
+  ul li {
+    font-size: 20px; 
+  }
+
+  ul li span {
+    font-size: 20px; 
   }
 }
