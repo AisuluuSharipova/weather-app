@@ -17,17 +17,34 @@ const App = () => {
     setError(null);
     setWeather(null);
     setLoading(true);
+
     try {
-      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
-      const response = await axios.get(
+      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY; 
+      const weatherResponse = await axios.get(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
       );
-      setWeather(response.data);
+
+      setWeather(weatherResponse.data);
       fetchForecast(city);
     } catch (err) {
-      setError('City not found');
+      setError('Invalid city name');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchForecast = async (city) => {
+    setError(null);
+
+    try {
+      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      const forecastResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`
+      );
+
+      setForecast(forecastResponse.data.list);
+    } catch (err) {
+      setError('Unable to fetch forecast');
     }
   };
 
@@ -50,44 +67,29 @@ const App = () => {
     if (savedFavorites) setFavorites(savedFavorites);
   }, []);
 
-  const fetchWeatherByLocation = () => {
+  const geolocationWeather = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
-        try {
-          const response = await axios.get(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
-          );
-          setWeather(response.data);
-          fetchForecast(response.data.name);
-        } catch (err) {
-          setError('Unable to fetch weather for your location');
-        }
+        const response = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
+        );
+
+        setWeather(response.data);
+        fetchForecast(response.data.name);
       });
     } else {
-      setError('Geolocation is not supported by your browser');
+      setError('Geolocation not supported');
     }
   };
 
-  const fetchForecast = async (city) => {
-    setError(null);
-    try {
-      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
-      const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`
-      );
-      setForecast(response.data.list);
-    } catch (err) {
-      setError('Unable to fetch forecast');
-    }
-  }
-  
   return (
     <div className="app">
       <h1>Weather App</h1>
+      
       <WeatherSearch onSearch={fetchWeather} />
-      <button onClick={fetchWeatherByLocation}>Get Weather for My Location</button>
+      <button onClick={geolocationWeather}>Use My Location</button>
       
       {loading && <LoadingSpinner />}
 
@@ -107,12 +109,18 @@ const App = () => {
         {favorites.map((city, index) => (
           <li key={index}>
             <span>{city}</span>
-            <span
-              style={{ marginLeft: '10px', cursor: 'pointer', color: '#f56eb5' }}
+            <button
+              style={{ marginLeft: '10px' }}
+              onClick={() => fetchWeather(city)}
+            >
+              View Weather
+            </button>
+            <button
+              style={{ marginLeft: '10px' }}
               onClick={() => removeFavorite(city)}
             >
               Remove
-            </span>
+            </button>
           </li>
         ))}
       </ul>

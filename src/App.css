@@ -32,6 +32,12 @@ h1 {
   text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
+h2 {
+  font-size: 32px;
+  margin-top: 30px;
+  color: #fff;
+}
+
 button {
   padding: 8px 16px;
   background: linear-gradient(135deg, #eb2f96, #f56eb5);
@@ -54,10 +60,33 @@ button:active {
   transform: translateY(2px);
 }
 
-h2 {
-  font-size: 32px;
-  margin-top: 30px;
-  color: #fff;
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.search-input {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 250px;
+}
+
+.search-button {
+  padding: 8px 12px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background-color: #0056b3;
 }
 
 ul {
@@ -67,8 +96,8 @@ ul {
 }
 
 ul li {
-  margin-bottom: 15px; 
-  font-size: 22px; 
+  margin-bottom: 15px;
+  font-size: 22px;
   color: #f5f5f5;
   display: flex;
   justify-content: center;
@@ -76,32 +105,31 @@ ul li {
 }
 
 ul li span {
-  font-size: 22px; 
+  font-size: 22px;
   color: #f5f5f5;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
 ul li span:hover {
-  color: #f56eb5; 
+  color: #f56eb5;
 }
 
 
 ul li span:nth-child(2) {
   margin-left: 10px;
-  padding: 8px 16px; 
-  background: linear-gradient(135deg, #eb2f96, #f56eb5); 
-  color: white !important; 
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #eb2f96, #f56eb5);
+  color: white !important;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 14px; 
+  font-size: 14px;
   transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  padding: 8px 16px;
 }
 
 ul li span:nth-child(2):hover {
-  background: linear-gradient(135deg, #f56eb5, #d92b85); 
+  background: linear-gradient(135deg, #f56eb5, #d92b85);
   transform: translateY(-3px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
@@ -127,14 +155,6 @@ ul li span:nth-child(2):active {
 .forecast-container:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
-}
-
-.search-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 15px;
-  width: 100%;
 }
 
 input[type="text"] {
@@ -167,8 +187,13 @@ input[type="text"]:focus {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {
@@ -192,10 +217,10 @@ input[type="text"]:focus {
   }
 
   ul li {
-    font-size: 20px; 
+    font-size: 20px;
   }
 
   ul li span {
-    font-size: 20px; 
+    font-size: 20px;
   }
 }

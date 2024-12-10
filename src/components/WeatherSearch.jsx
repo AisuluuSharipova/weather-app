@@ -3,21 +3,25 @@ import React, { useState } from 'react';
 const WeatherSearch = ({ onSearch }) => {
   const [city, setCity] = useState('');
 
-  const handleSearch = () => {
-    if (city.trim()) {
+  const handleSubmit = () => {
+    if (city.trim() !== '') {
       onSearch(city);
+      setCity('');
     }
   };
 
   return (
-    <div>
+    <div className="search-container">
       <input
         type="text"
-        placeholder="Enter city name"
         value={city}
         onChange={(e) => setCity(e.target.value)}
+        placeholder="Enter city name"
+        className="search-input"
       />
-      <button onClick={handleSearch}>Search</button>
+      <button onClick={handleSubmit} className="search-button">
+        Search
+      </button>
     </div>
   );
 };
