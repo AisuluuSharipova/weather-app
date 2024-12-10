@@ -3,6 +3,7 @@ import axios from 'axios';
 import WeatherSearch from './components/WeatherSearch';
 import WeatherDetails from './components/WeatherDetails';
 import LoadingSpinner from './components/LoadingSpinner';
+import ForecastChart from './components/ForecastChart';
 import './App.css';
 
 const App = () => {
@@ -10,6 +11,7 @@ const App = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
+  const [forecast, setForecast] = useState(null); 
 
   const fetchWeather = async (city) => {
     setError(null);
@@ -21,6 +23,7 @@ const App = () => {
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
       );
       setWeather(response.data);
+      fetchForecast(city); 
     } catch (err) {
       setError('City not found');
     } finally {
@@ -40,7 +43,6 @@ const App = () => {
     const savedFavorites = JSON.parse(localStorage.getItem('favorites'));
     if (savedFavorites) setFavorites(savedFavorites);
   }, []);
-
   
   const fetchWeatherByLocation = () => {
     if (navigator.geolocation) {
@@ -52,6 +54,7 @@ const App = () => {
             `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
           );
           setWeather(response.data);
+          fetchForecast(response.data.name); 
         } catch (err) {
           setError('Unable to fetch weather for your location');
         }
@@ -61,6 +64,19 @@ const App = () => {
     }
   };
 
+  const fetchForecast = async (city) => {
+    setError(null);
+    try {
+      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`
+      );
+      setForecast(response.data.list);
+    } catch (err) {
+      setError('Unable to fetch forecast');
+    }
+  };
+  
   return (
     <div className="app">
       <h1>Weather App</h1>
@@ -82,6 +98,7 @@ const App = () => {
           </li>
         ))}
       </ul>
+      {forecast && <ForecastChart forecastData={forecast} />} {/* Отображаем прогноз */}
     </div>
   );
 };
