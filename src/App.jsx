@@ -11,7 +11,8 @@ const App = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
-  const [forecast, setForecast] = useState(null); 
+  const [forecast, setForecast] = useState(null);
+  const [city, setCity] = useState('');
 
   const fetchWeather = async (city) => {
     setError(null);
@@ -23,7 +24,7 @@ const App = () => {
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
       );
       setWeather(response.data);
-      fetchForecast(city); 
+      fetchForecast(city);
     } catch (err) {
       setError('City not found');
     } finally {
@@ -43,7 +44,7 @@ const App = () => {
     const savedFavorites = JSON.parse(localStorage.getItem('favorites'));
     if (savedFavorites) setFavorites(savedFavorites);
   }, []);
-  
+
   const fetchWeatherByLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
@@ -54,7 +55,7 @@ const App = () => {
             `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
           );
           setWeather(response.data);
-          fetchForecast(response.data.name); 
+          fetchForecast(response.data.name);
         } catch (err) {
           setError('Unable to fetch weather for your location');
         }
@@ -76,20 +77,45 @@ const App = () => {
       setError('Unable to fetch forecast');
     }
   };
-  
+
+  const handleCityChange = (event) => {
+    setCity(event.target.value);
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    fetchWeather(city);
+  };
+
   return (
     <div className="app">
       <h1>Weather App</h1>
-      <WeatherSearch onSearch={fetchWeather} />
+     
+      <form onSubmit={handleSearchSubmit}>
+        <input
+          type="text"
+          value={city}
+          onChange={handleCityChange}
+          placeholder="Enter city name"
+        />
+        <button type="submit">Search</button>
+      </form>
+
       <button onClick={fetchWeatherByLocation}>Get Weather for My Location</button>
+      
       {loading && <LoadingSpinner />}
+
       {error && <p>{error}</p>}
+
       {weather && (
         <>
           <WeatherDetails weather={weather} />
           <button onClick={() => addFavorite(weather.name)}>Add to Favorites</button>
         </>
       )}
+
+      {forecast && <ForecastChart forecastData={forecast} />}
+
       <h2>Favorites</h2>
       <ul>
         {favorites.map((city, index) => (
@@ -98,7 +124,7 @@ const App = () => {
           </li>
         ))}
       </ul>
-      {forecast && <ForecastChart forecastData={forecast} />} 
+
     </div>
   );
 };
