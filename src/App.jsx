@@ -98,7 +98,7 @@ const App = () => {
           </li>
         ))}
       </ul>
-      {forecast && <ForecastChart forecastData={forecast} />} {/* Отображаем прогноз */}
+      {forecast && <ForecastChart forecastData={forecast} />} 
     </div>
   );
 };

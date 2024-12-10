@@ -26,6 +26,9 @@ const ForecastChart = ({ forecastData }) => {
         fill: false,
         backgroundColor: 'rgba(75, 192, 192, 0.4)',
         borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 2,
+        pointRadius: 5,
+        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
       },
     ],
   };
@@ -55,12 +58,16 @@ const ForecastChart = ({ forecastData }) => {
           display: true,
           text: 'Date',
         },
+        ticks: {
+          autoSkip: true,
+          maxTicksLimit: 5,
+        },
       },
     },
   };
 
   return (
-    <div style={{ width: '100%', maxWidth: '600px', margin: 'auto' }}>
+    <div style={{ width: '100%', maxWidth: '600px', margin: 'auto', paddingTop: '20px' }}>
       <Line data={data} options={options} />
     </div>
   );
