@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import WeatherSearch from './components/WeatherSearch';
 import WeatherDetails from './components/WeatherDetails';
@@ -9,6 +9,7 @@ const App = () => {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [favorites, setFavorites] = useState([]);
 
   const fetchWeather = async (city) => {
     setError(null);
@@ -27,13 +28,60 @@ const App = () => {
     }
   };
 
+  const addFavorite = (city) => {
+    if (!favorites.includes(city)) {
+      const updatedFavorites = [...favorites, city];
+      setFavorites(updatedFavorites);
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    }
+  };
+
+  useEffect(() => {
+    const savedFavorites = JSON.parse(localStorage.getItem('favorites'));
+    if (savedFavorites) setFavorites(savedFavorites);
+  }, []);
+
+  
+  const fetchWeatherByLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+        try {
+          const response = await axios.get(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
+          );
+          setWeather(response.data);
+        } catch (err) {
+          setError('Unable to fetch weather for your location');
+        }
+      });
+    } else {
+      setError('Geolocation is not supported by your browser');
+    }
+  };
+
   return (
     <div className="app">
       <h1>Weather App</h1>
       <WeatherSearch onSearch={fetchWeather} />
+      <button onClick={fetchWeatherByLocation}>Get Weather for My Location</button>
       {loading && <LoadingSpinner />}
       {error && <p>{error}</p>}
-      {weather && <WeatherDetails weather={weather} />}
+      {weather && (
+        <>
+          <WeatherDetails weather={weather} />
+          <button onClick={() => addFavorite(weather.name)}>Add to Favorites</button>
+        </>
+      )}
+      <h2>Favorites</h2>
+      <ul>
+        {favorites.map((city, index) => (
+          <li key={index}>
+            <button onClick={() => fetchWeather(city)}>{city}</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
