@@ -87,23 +87,24 @@ const App = () => {
   return (
     <div className="app">
       <h1>Weather App</h1>
-      
-      <WeatherSearch onSearch={fetchWeather} />
-      <button onClick={geolocationWeather}>Use My Location</button>
-      
+{     
+      <div className="search-section">
+      <WeatherSearch onSearch={fetchWeather} geolocationWeather={geolocationWeather} />
+    </div>    
+       }
       {loading && <LoadingSpinner />}
-
+  
       {error && <p>{error}</p>}
-
+  
       {weather && (
         <>
           <WeatherDetails weather={weather} />
           <button onClick={() => addFavorite(weather.name)}>Add to Favorites</button>
         </>
       )}
-
+  
       {forecast && <ForecastChart forecastData={forecast} />}
-
+  
       <h2>Favorites</h2>
       <ul>
         {favorites.map((city, index) => (
@@ -124,7 +125,6 @@ const App = () => {
           </li>
         ))}
       </ul>
-
     </div>
   );
 };
