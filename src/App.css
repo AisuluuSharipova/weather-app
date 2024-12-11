@@ -41,6 +41,7 @@ input[type="text"] {
   max-width: 400px;
   background-color: #fff;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  color: #0a0825;
 }
 
 input[type="text"]:focus {

@@ -1,50 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import WeatherSearch from './components/WeatherSearch';
 import WeatherDetails from './components/WeatherDetails';
 import LoadingSpinner from './components/LoadingSpinner';
 import ForecastChart from './components/ForecastChart';
+import FavoritesList from './components/FavoritesList';
+import { fetchWeatherData, fetchForecastData, fetchWeatherByCoordinates } from './api/weatherApi';
 import './App.css';
 
 const App = () => {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [forecast, setForecast] = useState(null);
+  const [status, setStatus] = useState('idle'); 
 
   const fetchWeather = async (city) => {
     setError(null);
     setWeather(null);
-    setLoading(true);
-
+    setStatus('pending'); 
+  
     try {
-      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY; 
-      const weatherResponse = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
-      );
-
-      setWeather(weatherResponse.data);
-      fetchForecast(city);
+      const weatherData = await fetchWeatherData(city);
+      setWeather(weatherData);
+      await fetchForecast(city);
+      setStatus('done'); 
     } catch (err) {
       setError('Invalid city name');
-    } finally {
-      setLoading(false);
+      setStatus('error'); 
     }
   };
-
+  
   const fetchForecast = async (city) => {
     setError(null);
 
     try {
-      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
-      const forecastResponse = await axios.get(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`
-      );
-
-      setForecast(forecastResponse.data.list);
+      const forecastData = await fetchForecastData(city);
+      setForecast(forecastData);
     } catch (err) {
       setError('Unable to fetch forecast');
+      setStatus('error');
     }
   };
 
@@ -71,13 +65,15 @@ const App = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
-        const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
-        const response = await axios.get(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
-        );
-
-        setWeather(response.data);
-        fetchForecast(response.data.name);
+        try {
+          const weatherData = await fetchWeatherByCoordinates(latitude, longitude);
+          setWeather(weatherData);
+          await fetchForecast(weatherData.name);
+          setStatus('done');
+        } catch (err) {
+          setError('Unable to fetch weather data');
+          setStatus('error');
+        }
       });
     } else {
       setError('Geolocation not supported');
@@ -87,44 +83,28 @@ const App = () => {
   return (
     <div className="app">
       <h1>Weather App</h1>
-{     
+
       <div className="search-section">
-      <WeatherSearch onSearch={fetchWeather} geolocationWeather={geolocationWeather} />
-    </div>    
-       }
-      {loading && <LoadingSpinner />}
-  
-      {error && <p>{error}</p>}
-  
+        <WeatherSearch onSearch={fetchWeather} geolocationWeather={geolocationWeather} />
+      </div>
+
+      {status === 'pending' && <LoadingSpinner />}
+      {status === 'error' && <p>{error}</p>}
+
       {weather && (
         <>
           <WeatherDetails weather={weather} />
           <button onClick={() => addFavorite(weather.name)}>Add to Favorites</button>
         </>
       )}
-  
+
       {forecast && <ForecastChart forecastData={forecast} />}
-  
-      <h2>Favorites</h2>
-      <ul>
-        {favorites.map((city, index) => (
-          <li key={index}>
-            <span>{city}</span>
-            <button
-              style={{ marginLeft: '10px' }}
-              onClick={() => fetchWeather(city)}
-            >
-              View Weather
-            </button>
-            <button
-              style={{ marginLeft: '10px' }}
-              onClick={() => removeFavorite(city)}
-            >
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
+
+      <FavoritesList
+        favorites={favorites}
+        fetchWeather={fetchWeather}
+        removeFavorite={removeFavorite}
+      />
     </div>
   );
 };
